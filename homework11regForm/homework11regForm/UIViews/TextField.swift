@@ -38,7 +38,7 @@ class TextField: UITextField {
         self.clearButtonMode = .whileEditing
         self.translatesAutoresizingMaskIntoConstraints = false
         
-        self.heightAnchor.constraint(equalToConstant: 56).isActive = true
+        self.heightAnchor.constraint(equalToConstant: 48).isActive = true
     }
     
 }

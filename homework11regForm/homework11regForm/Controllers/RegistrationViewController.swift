@@ -7,9 +7,9 @@
 
 import UIKit
 
-class RegistrationViewController: UIViewController, UITextFieldDelegate {
+final class RegistrationViewController: UIViewController, UITextFieldDelegate {
     
-    let titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Внесите свои данные"
         label.textAlignment = .center
@@ -18,7 +18,7 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
         return label
     }()
     
-    let textFieldsStack: UIStackView = {
+    private let textFieldsStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
         stack.backgroundColor = .clear
@@ -28,12 +28,23 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
         return stack
     }()
     
-    let firstNameTextField = TextField(placeholder: "Имя")
-    let lastNameTextField = TextField(placeholder: "Фамилия")
-    let mailTextField = TextField(placeholder: "Почта")
-    let passwordTextField = TextField(placeholder: "Пароль")
+    private let firstNameTextField = TextField(placeholder: "Имя")
+    private let lastNameTextField = TextField(placeholder: "Фамилия")
+    private let mailTextField = TextField(placeholder: "Почта")
+    private let passwordTextField = TextField(placeholder: "Пароль")
     
-    lazy var textFieldsArray = [
+    private let createUserButton: UIButton = {
+        let button = UIButton()
+        button.clipsToBounds = true
+        button.layer.cornerRadius = 12
+        button.backgroundColor = .systemTeal
+        button.setTitleColor(.white, for: .normal)
+        button.setTitle("Cоздать аккаунт", for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private lazy var textFieldsArray = [
         firstNameTextField,
         lastNameTextField,
         mailTextField,
@@ -52,6 +63,7 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
         
         view.addSubview(titleLabel)
         view.addSubview(textFieldsStack)
+        view.addSubview(createUserButton)
         
         textFieldsStack.addArrangedSubview(firstNameTextField)
         textFieldsStack.addArrangedSubview(lastNameTextField)
@@ -67,10 +79,17 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
         ])
         
         NSLayoutConstraint.activate([
-            textFieldsStack.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: inset),
+            textFieldsStack.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: inset*2),
             textFieldsStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: inset),
             textFieldsStack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -inset),
-            textFieldsStack.heightAnchor.constraint(equalToConstant: CGFloat(56*4+16*3))
+            textFieldsStack.heightAnchor.constraint(equalToConstant: CGFloat(48*4+16*3))
+        ])
+        
+        NSLayoutConstraint.activate([
+            createUserButton.topAnchor.constraint(equalTo: textFieldsStack.bottomAnchor, constant: inset*2),
+            createUserButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: inset*2),
+            createUserButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -inset*2),
+            createUserButton.heightAnchor.constraint(equalToConstant: 56)
         ])
     }
     
@@ -79,11 +98,30 @@ class RegistrationViewController: UIViewController, UITextFieldDelegate {
         
         textFieldsArray.map {$0.delegate = self}
         
+        createUserButton.addTarget(self, action: #selector(tapButton), for: .touchUpInside)
     }
     
+    @objc private func tapButton() {
+        createUserButton.animationTapButton()
+
+        textFieldsArray.map {$0.shakeTextFieldifEmpty()}
+        
+        guard let firstName = firstNameTextField.text else {return}
+        guard let lastName = lastNameTextField.text else {return}
+        guard let mailText = mailTextField.text else {return}
+        guard let password = passwordTextField.text else {return}
+        
+        if firstName != "" && lastName != "" && mailText != "" && password != "" {
+            let userModel = UserData(firstName: firstName, lastName: lastName, mail: mailText, password: password)
+            let vc = ProfileViewController(user: userModel)
+            self.navigationController?.setViewControllers([vc], animated: true)
+        }
+        
+    }
+    
+    //установка скрытия клавиатуры
     private func setupTapGesture() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
-        
         view.addGestureRecognizer(tap)
     }
     
