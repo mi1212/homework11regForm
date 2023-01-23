@@ -9,10 +9,10 @@ import UIKit
 
 class TextField: UITextField {
     
-    init(placeholder: String) {
+    init(placeholder: String, keyboardType: UIKeyboardType) {
         super.init(frame: .zero)
-        self.placeholder = placeholder
-        setupProperts()
+        
+        setupProperts(placeholder: placeholder, keyboardType: keyboardType)
         
     }
     @available (*, unavailable)
@@ -20,7 +20,7 @@ class TextField: UITextField {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setupProperts() {
+    private func setupProperts(placeholder: String, keyboardType: UIKeyboardType) {
         let leftView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: 2))
         self.leftView = leftView
         self.leftViewMode = .always
@@ -37,7 +37,8 @@ class TextField: UITextField {
         self.backgroundColor = .white
         self.clearButtonMode = .whileEditing
         self.translatesAutoresizingMaskIntoConstraints = false
-        
+        self.placeholder = placeholder
+        self.keyboardType = keyboardType
         self.heightAnchor.constraint(equalToConstant: 48).isActive = true
     }
     

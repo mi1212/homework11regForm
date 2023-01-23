@@ -131,7 +131,7 @@ final class ProfileViewController: UIViewController {
     }
 
     @objc private func tapButton() {
-        let vc = RegistrationViewController()
+        let vc = LoginViewController()
         navigationController?.setViewControllers([vc], animated: true)
     }
 }

@@ -11,7 +11,7 @@ final class LoginViewController: UIViewController {
     
     private let iconImageView: UIImageView = {
         let image = UIImageView()
-        image.image = UIImage(named: "pizza")
+        image.image = UIImage(named: "boris")
         image.contentMode = .scaleAspectFit
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
@@ -38,60 +38,16 @@ final class LoginViewController: UIViewController {
     
     private let createUserButton: UIButton = {
         let button = UIButton()
-//        button.layer.cornerRadius = 12
         button.clipsToBounds = true
         button.setTitle("create user", for: .normal)
         button.setTitleColor(.black, for: .normal)
-//        button.backgroundColor = .white
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    private let phoneTextField: UITextField = {
-        let textfield = UITextField()
-        let leftView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: 2))
-        textfield.leftView = leftView
-        textfield.leftViewMode = .always
-        textfield.rightView = leftView
-        textfield.rightViewMode = .always
-        textfield.autocapitalizationType = .none
-        textfield.tintColor = .black
-        textfield.textColor = .black
-        textfield.adjustsFontForContentSizeCategory = true
-        textfield.layer.cornerRadius = 12
-        textfield.layer.borderColor = UIColor.lightGray.cgColor
-        textfield.layer.borderWidth = 2
-        textfield.clipsToBounds = true
-//        textfield
-        textfield.placeholder = "phone number (введите 987654321)"
-        textfield.backgroundColor = .white
-        textfield.clearButtonMode = .whileEditing
-        textfield.translatesAutoresizingMaskIntoConstraints = false
-        return textfield
-    }()
+    let mailTextField = TextField(placeholder: "mail", keyboardType: .emailAddress)
     
-    private let passTextField: UITextField = {
-        let textfield = UITextField()
-        let leftView = UIView(frame: CGRect(x: 0, y: 0, width: 15, height: 2))
-        textfield.leftView = leftView
-        textfield.leftViewMode = .always
-        textfield.rightView = leftView
-        textfield.rightViewMode = .always
-        textfield.autocapitalizationType = .none
-        textfield.backgroundColor = .white
-        textfield.tintColor = .black
-        textfield.textColor = .black
-        textfield.adjustsFontForContentSizeCategory = true
-        textfield.layer.cornerRadius = 12
-        textfield.layer.borderColor = UIColor.lightGray.cgColor
-        textfield.layer.borderWidth = 2
-        textfield.clipsToBounds = true
-        textfield.clearButtonMode = .whileEditing
-        textfield.isSecureTextEntry = true
-        textfield.placeholder = "password (введите 123456)"
-        textfield.translatesAutoresizingMaskIntoConstraints = false
-        return textfield
-    }()
+    private let passTextField = TextField(placeholder: "password", keyboardType: .default)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -106,7 +62,7 @@ final class LoginViewController: UIViewController {
         self.view.addSubview(loginButton)
         self.view.addSubview(createUserButton)
         
-        textFieldsStack.addArrangedSubview(phoneTextField)
+        textFieldsStack.addArrangedSubview(mailTextField)
         textFieldsStack.addArrangedSubview(passTextField)
         
         loginButton.addTarget(self, action: #selector(tapButton), for: .touchUpInside)
@@ -122,7 +78,7 @@ final class LoginViewController: UIViewController {
         ])
         
         NSLayoutConstraint.activate([
-            iconImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.1),
+            iconImageView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.2),
             iconImageView.widthAnchor.constraint(equalTo: iconImageView.heightAnchor),
             iconImageView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
             iconImageView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: inset*3)
@@ -145,11 +101,11 @@ final class LoginViewController: UIViewController {
     @objc private func tapButton() {
         loginButton.animationTapButton()
         passTextField.shakeTextFieldifEmpty()
-        phoneTextField.shakeTextFieldifEmpty()
-        let pass = passTextField.text
-        let phone = phoneTextField.text
-        if pass == "123456" && phone == "987654321" {
-            let user = UserData(firstName: "test Name", lastName: "test LastName", mail: "mail@mail.ru", password: "123456")
+        mailTextField.shakeTextFieldifEmpty()
+        guard let pass = passTextField.text else {return}
+        guard let mail = mailTextField.text else {return}
+        if pass == "123456" && mail == "test@mail.ru" {
+            let user = UserData(firstName: "test Name", lastName: "test LastName", mail: mail, password: pass)
             let vc = ProfileViewController(user: user)
             self.navigationController?.setViewControllers([vc], animated: true)
         }

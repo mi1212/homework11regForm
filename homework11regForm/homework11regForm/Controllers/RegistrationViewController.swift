@@ -28,10 +28,10 @@ final class RegistrationViewController: UIViewController, UITextFieldDelegate {
         return stack
     }()
     
-    private let firstNameTextField = TextField(placeholder: "Имя")
-    private let lastNameTextField = TextField(placeholder: "Фамилия")
-    private let mailTextField = TextField(placeholder: "Почта")
-    private let passwordTextField = TextField(placeholder: "Пароль")
+    private let firstNameTextField = TextField(placeholder: "Имя", keyboardType: .default)
+    private let lastNameTextField = TextField(placeholder: "Фамилия", keyboardType: .default)
+    private let mailTextField = TextField(placeholder: "Почта", keyboardType: .emailAddress)
+    private let passwordTextField = TextField(placeholder: "Пароль", keyboardType: .default)
     
     private let createUserButton: UIButton = {
         let button = UIButton()
@@ -104,22 +104,27 @@ final class RegistrationViewController: UIViewController, UITextFieldDelegate {
     @objc private func tapButton() {
         createUserButton.animationTapButton()
 
-        textFieldsArray.map {$0.shakeTextFieldifEmpty()}
+        
         
         guard let firstName = firstNameTextField.text else {return}
         guard let lastName = lastNameTextField.text else {return}
         guard let mailText = mailTextField.text else {return}
         guard let password = passwordTextField.text else {return}
         
-        if firstName != "" && lastName != "" && mailText != "" && password != "" {
-            let userModel = UserData(firstName: firstName, lastName: lastName, mail: mailText, password: password)
-            let vc = ProfileViewController(user: userModel)
-            self.navigationController?.setViewControllers([vc], animated: true)
+        if mailText == "test@mail.ru" {
+            showAlreadyRegistredAlert(mail: mailText)
+        } else {
+            if firstName != "" && lastName != "" && mailText != "" && password != "" {
+                let userModel = UserData(firstName: firstName, lastName: lastName, mail: mailText, password: password)
+                let vc = ProfileViewController(user: userModel)
+                self.navigationController?.setViewControllers([vc], animated: true)
+            } else {
+                textFieldsArray.map {$0.shakeTextFieldifEmpty()}
+            }
         }
-        
     }
     
-    //установка скрытия клавиатуры
+    // MARK: - hide keyboard by tap in screen
     private func setupTapGesture() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
         view.addGestureRecognizer(tap)
@@ -129,6 +134,7 @@ final class RegistrationViewController: UIViewController, UITextFieldDelegate {
         self.view.endEditing(true)
     }
     
+    // MARK: - keyboard notifications
     func registerForKeyboardNotifications() {
         NotificationCenter.default.addObserver(
             self,
@@ -145,13 +151,14 @@ final class RegistrationViewController: UIViewController, UITextFieldDelegate {
     }
     
     @objc func keyboardWillShown(_ notificiation: NSNotification) {
-        self.view.frame.origin.y = -40
+        self.view.frame.origin.y = -30
     }
     
     @objc func keyboardWillBeHidden(_ notificiation: NSNotification) {
         self.view.frame.origin.y = 0
     }
     
+    // MARK: - Transition to next TextField by press Return
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         for i in 0...textFieldsArray.count - 1 {
@@ -166,5 +173,30 @@ final class RegistrationViewController: UIViewController, UITextFieldDelegate {
         }
         return true
     }
+    
+    // MARK: - Alert if User already registred
+    func showAlreadyRegistredAlert(mail: String) {
+        let alert = UIAlertController(
+            title: "Пользователь с такой почтой уже зарегистрирован",
+            message: "Вы можете войти в свой профиль, используя эту почту",
+            preferredStyle: UIAlertController.Style.alert
+        )
+
+        alert.addAction(UIAlertAction(
+            title: "Понятно",
+            style: UIAlertAction.Style.cancel)
+        )
+        
+        // если пользователь с такой почтой существует, то по нажатии кнопки "Войти"
+        // происходит переход на LoginViewController с введенной почтой в textfield mail
+        
+        alert.addAction(UIAlertAction(title: "Войти", style: .default, handler: { action in
+            let vc = LoginViewController()
+            vc.mailTextField.text = mail
+            self.navigationController?.setViewControllers([vc], animated: true)
+        }))
+        
+            self.present(alert, animated: true, completion: nil)
+        }
     
 }
